@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Предложить обмен для: "{{ ad_receiver.title }}"</h2>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+    
+    <div class="mb-3">
+        <label for="{{ form.ad_sender.id_for_label }}" class="form-label">{{ form.ad_sender.label }}</label>
+        {{ form.ad_sender }}
+        {% if form.ad_sender.errors %}
+            <div class="text-danger">{{ form.ad_sender.errors }}</div>
+        {% endif %}
+    </div>
+
+    <div class="mb-3">
+        <label for="{{ form.comment.id_for_label }}" class="form-label">{{ form.comment.label }}</label>
+        {{ form.comment }}
+        {% if form.comment.errors %}
+            <div class="text-danger">{{ form.comment.errors }}</div>
+        {% endif %}
+    </div>
+
+    <button type="submit" class="btn btn-primary">Отправить предложение</button>
+    <a href="{% url 'ad_list' %}" class="btn btn-secondary ms-2">Отмена</a>
+</form>
+{% endblock %}

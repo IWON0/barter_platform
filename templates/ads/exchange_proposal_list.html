@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2 class="mb-4">Предложения обмена</h2>
+
+  <form method="get" class="row g-3 mb-4">
+    <div class="col-md-4">
+      <input type="text" name="sender" class="form-control" placeholder="Отправитель" value="{{ filter_sender }}">
+    </div>
+    <div class="col-md-4">
+      <input type="text" name="receiver" class="form-control" placeholder="Получатель" value="{{ filter_receiver }}">
+    </div>
+    <div class="col-md-4">
+      <select name="status" class="form-select">
+        <option value="">Все статусы</option>
+        {% for val, display in status_choices %}
+          <option value="{{ val }}" {% if filter_status == val %}selected{% endif %}>{{ display }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-12 text-end">
+      <button type="submit" class="btn btn-primary">Фильтровать</button>
+    </div>
+  </form>
+
+  <div class="row gy-4">
+    {% for proposal in proposals %}
+      <div class="col-md-6 col-lg-4">
+        <div class="card shadow-sm h-100 border border-light-subtle">
+          <div class="row g-0">
+            <div class="col-6 border-end">
+              <div class="p-3 text-center">
+                <strong>От:</strong> {{ proposal.ad_sender.user.username }}
+                <img src="{{ proposal.ad_sender.image_url|default:'https://via.placeholder.com/200x150?text=Нет+фото' }}"
+                     class="img-fluid rounded mt-2" alt="{{ proposal.ad_sender.title }}">
+                <p class="mt-2 mb-0 fw-semibold">{{ proposal.ad_sender.title }}</p>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="p-3 text-center">
+                <strong>Кому:</strong> {{ proposal.ad_receiver.user.username }}
+                <img src="{{ proposal.ad_receiver.image_url|default:'https://via.placeholder.com/200x150?text=Нет+фото' }}"
+                     class="img-fluid rounded mt-2" alt="{{ proposal.ad_receiver.title }}">
+                <p class="mt-2 mb-0 fw-semibold">{{ proposal.ad_receiver.title }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-body">
+            {% if proposal.comment %}
+              <p class="card-text"><strong>Комментарий:</strong> {{ proposal.comment }}</p>
+            {% endif %}
+
+            <p>
+              <span class="badge 
+                {% if proposal.status == 'pending' %}bg-warning text-dark
+                {% elif proposal.status == 'accepted' %}bg-success
+                {% else %}bg-danger
+                {% endif %}">
+                {{ proposal.get_status_display }}
+              </span>
+            </p>
+
+            {% if proposal.status == 'pending' %}
+              <div class="d-grid gap-2">
+                {% if user == proposal.ad_receiver.user %}
+                  <a href="{% url 'exchange_proposal_accept' proposal.id %}" class="btn btn-success btn-sm">✅ Принять</a>
+                {% endif %}
+                {% if user == proposal.ad_sender.user or user == proposal.ad_receiver.user %}
+                  <a href="{% url 'exchange_proposal_reject' proposal.id %}" class="btn btn-outline-danger btn-sm">❌ Отклонить</a>
+                {% endif %}
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col-12">
+        <div class="alert alert-info text-center">Нет предложений обмена.</div>
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h2 class="mb-4">Объявления</h2>
+
+<form method="get" class="row mb-4 g-2">
+  <div class="col-md-4">
+    <input type="text" name="q" class="form-control" placeholder="Поиск..." value="{{ query }}">
+  </div>
+  <div class="col-md-3">
+    <select name="category" class="form-select">
+      <option value="">Все категории</option>
+      {% for cat in categories %}
+        <option value="{{ cat }}" {% if selected_category == cat %}selected{% endif %}>{{ cat }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-3">
+    <select name="condition" class="form-select">
+      <option value="">Все состояния</option>
+      {% for val, display in conditions %}
+        <option value="{{ val }}" {% if selected_condition == val %}selected{% endif %}>{{ display }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2">
+    <button type="submit" class="btn btn-primary w-100">Фильтр</button>
+  </div>
+</form>
+
+<div class="row">
+  {% for ad in page_obj %}
+    <div class="col-md-6 col-lg-4 mb-4">
+      <div class="card h-100 shadow-sm">
+        {% if ad.image_url %}
+          <img src="{{ ad.image_url }}" class="card-img-top" alt="{{ ad.title }}">
+        {% else %}
+          <img src="https://via.placeholder.com/400x250?text=Нет+изображения" class="card-img-top" alt="Нет изображения">
+        {% endif %}
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">{{ ad.title }}</h5>
+          <h6 class="card-subtitle mb-2 text-muted">Опубликовано: {{ ad.created_at|date:"d.m.Y H:i" }}</h6>
+          <h6 class="card-subtitle mb-2 text-muted">От пользователя: {{ ad.user.username }}</h6>
+          <p class="card-text">{{ ad.description|truncatechars:100 }}</p>
+          <p><strong>Категория:</strong> {{ ad.category }}</p>
+          <p><strong>Состояние:</strong> {{ ad.get_condition_display }}</p>
+          <div class="mt-auto">
+            {% if user.is_authenticated %}
+              {% if ad.user == user %}
+  <div class="d-grid gap-2">
+    <a href="{% url 'ad_edit' ad.id %}" class="btn btn-warning btn-sm">Редактировать</a>
+    <form method="post" action="{% url 'ad_delete' ad.id %}" onsubmit="return confirm('Вы уверены, что хотите удалить это объявление?');">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
+    </form>
+  </div>
+{% else %}
+                <a href="{% url 'exchange_proposal_create' ad.id %}" class="btn btn-primary btn-sm w-100">Предложить обмен</a>
+              {% endif %}
+            {% else %}
+              <a href="{% url 'login' %}?next={% url 'ad_list' %}" class="btn btn-outline-primary btn-sm w-100">Войти, чтобы обменяться</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <p>Объявлений не найдено.</p>
+  {% endfor %}
+</div>
+
+<nav class="mt-4">
+  <ul class="pagination justify-content-center">
+    {% if page_obj.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?{% if query %}q={{ query }}&{% endif %}{% if selected_category %}category={{ selected_category }}&{% endif %}{% if selected_condition %}condition={{ selected_condition }}&{% endif %}page={{ page_obj.previous_page_number }}">Назад</a>
+      </li>
+    {% endif %}
+
+    <li class="page-item active"><span class="page-link">{{ page_obj.number }}</span></li>
+
+    {% if page_obj.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?{% if query %}q={{ query }}&{% endif %}{% if selected_category %}category={{ selected_category }}&{% endif %}{% if selected_condition %}condition={{ selected_condition }}&{% endif %}page={{ page_obj.next_page_number }}">Вперёд</a>
+      </li>
+    {% endif %}
+  </ul>
+</nav>
+
+{% endblock %}
