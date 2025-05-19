@@ -21,7 +21,7 @@
 
 ```bash
 
-git clone https://github.com/IWON0/barter_platform.git
+git clone https://github.com/IWON0/barter-platform.git
 cd barter_platform
 ```
 
@@ -42,3 +42,5 @@ http://localhost:8000
 
 docker-compose exec web python manage.py test
 ```
+
+![img.png](img.png)

@@ -21,7 +21,7 @@ urlpatterns = [
 ]
 
 router = DefaultRouter()
-router.register(r'api/ads', AdViewSet)
-router.register(r'api/proposals', ExchangeProposalViewSet)
+router.register(r'api/ads', AdViewSet, basename='ad')
+router.register(r'api/proposals', ExchangeProposalViewSet, basename='exchangeproposal')
 
 urlpatterns += router.urls

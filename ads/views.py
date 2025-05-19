@@ -18,8 +18,10 @@ from rest_framework.response import Response
 
 
 class AdViewSet(viewsets.ModelViewSet):
-    queryset = Ad.objects.all()
     serializer_class = AdSerializer
+
+    def get_queryset(self):
+        return Ad.objects.select_related('user')
 
     def get_permissions(self):
         if self.action in ['update', 'partial_update', 'destroy']:
@@ -31,8 +33,13 @@ class AdViewSet(viewsets.ModelViewSet):
 
 
 class ExchangeProposalViewSet(viewsets.ModelViewSet):
-    queryset = ExchangeProposal.objects.all()
     serializer_class = ExchangeProposalSerializer
+
+    def get_queryset(self):
+        return (
+            ExchangeProposal.objects
+            .select_related('ad_sender__user', 'ad_receiver__user')
+        )
 
     def get_permissions(self):
         if self.action in ['update', 'partial_update', 'destroy']:
