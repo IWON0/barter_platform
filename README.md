@@ -21,7 +21,7 @@
 
 ```bash
 
-git clone https://github.com/IWON0/barter-platform.git
+git clone https://github.com/IWON0/barter_platform.git
 cd barter_platform
 ```
 
